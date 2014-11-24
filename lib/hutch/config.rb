@@ -90,9 +90,14 @@ module Hutch
       self.user_config
     end
 
-    def self.load_from_file(file)
-      YAML.load(ERB.new(File.read(file)).result).each do |attr, value|
-        Hutch::Config.send("#{attr}=", convert_value(attr, value))
+    def self.load_from_file(file, sub_config = nil)
+      yaml = if sub_config
+        begin
+          Rails.root # do we have rails?
+          YAML.load_file(file)[Rails.env][sub_config.to_s]
+        rescue
+          YAML.load_file(file)
+        end
       end
     end
 
