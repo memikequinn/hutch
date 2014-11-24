@@ -151,9 +151,13 @@ module Hutch
       end
 
       # Ensure all the desired bindings are present
-      routing_keys.each do |routing_key|
-        logger.debug "creating binding #{queue.name} <--> #{routing_key}"
-        queue.bind(@exchange, routing_key: routing_key)
+      if routing_keys.respond_to?(:each)
+        routing_keys.each do |routing_key|
+          logger.debug "creating binding #{queue.name} <--> #{routing_key}"
+          queue.bind(@exchange, routing_key: routing_key)
+        end
+      else
+        queue.bind(@exchange, routing_key: routing_keys)
       end
     end
 
