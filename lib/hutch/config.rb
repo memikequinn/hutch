@@ -71,8 +71,18 @@ module Hutch
       self.user_config
     end
 
-    def self.load_from_file(file)
-      YAML.load(file).each do |attr, value|
+    def self.load_from_file(file, sub_config = nil)
+      yaml = if sub_config
+        begin
+          Rails.root # do we have rails?
+          YAML.load_file(file)[Rails.env][sub_config.to_s]
+        rescue
+          YAML.load_file(file)
+        end
+      else
+        YAML.load_file(file)
+      end
+      yaml.each do |attr, value|
         Hutch::Config.send("#{attr}=", value)
       end
     end
