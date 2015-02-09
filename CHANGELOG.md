@@ -1,6 +1,31 @@
 ## 0.14.0 — (unreleased)
 
-No changes yet.
+### Logged Messages as Serialised as JSON
+
+...as opposed to Ruby object printing.
+
+Contributed by Andrew Morton.
+
+
+### Configurable Heartbeat
+
+Config now supports a new option: `:heartbeat`, which is passed
+on to Bunny.
+
+Contributed by Simon Taranto.
+
+
+### HoneyBadger Error Handler
+
+Contributed by Daniel Farrell.
+
+
+### Hutch.connected? Now Returns Up-to-Date Value
+
+`Hutch.connected?` no longer relies on an ivar and always returns
+an up-to-date value.
+
+Contributed by Pierre-Louis Gottfrois.
 
 
 ## 0.13.0 — Dec 5th, 2014
