@@ -1,4 +1,18 @@
-## 0.14.0 — (unreleased)
+## 0.15.0 — (unreleased)
+
+No changes yet.
+
+
+
+## 0.14.0 — Feb 23rd, 2015
+
+### Configurable Socket Timeouts
+
+Socket read and write timeouts are now configurable using
+the `read_timeout` and `write_timeout` options, respectively.
+
+Contributed by Chris Barton.
+
 
 ### Logged Messages as Serialised as JSON
 
