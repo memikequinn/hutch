@@ -22,6 +22,7 @@ module Hutch
         mq_api_port: 15672,
         mq_api_ssl: false,
         heartbeat: 30,
+        manual_bind: false,
         # placeholder, allows specifying connection parameters
         # as a URI.
         uri: nil,
