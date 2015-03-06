@@ -90,7 +90,7 @@ module Hutch
     # receive messages sent to the queue.
     def setup_queue(consumer)
       queue = @broker.queue(consumer.get_queue_name, consumer.get_arguments)
-      @broker.bind_queue(queue, consumer.routing_keys) unless Hutch::Config['manual_bind']
+      @broker.bind_queue(queue, consumer.routing_keys) unless Hutch::Config.to_hash[:manual_bind]
 
       queue.subscribe(manual_ack: true) do |*args|
         delivery_info, properties, payload = Hutch::Adapter.decode_message(*args)
