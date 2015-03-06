@@ -31,10 +31,9 @@ module Hutch
 
         handle_signals until shutdown_not_called?(0.1)
       else
-        # Take a break from Thread#join every 0.1 seconds to check if we've
-        # been sent any signals
-        handle_signals until @broker.wait_on_threads(0.1)
-      end
+      # Take a break from Thread#join every 0.1 seconds to check if we've
+      # been sent any signals
+      handle_signals until @broker.wait_on_threads(0.1)
     end
 
     # Register handlers for SIG{QUIT,TERM,INT} to shut down the worker
@@ -91,7 +90,7 @@ module Hutch
     # receive messages sent to the queue.
     def setup_queue(consumer)
       queue = @broker.queue(consumer.get_queue_name, consumer.get_arguments)
-      @broker.bind_queue(queue, consumer.routing_keys)
+      @broker.bind_queue(queue, consumer.routing_keys) unless Hutch::Config['manual_bind']
 
       queue.subscribe(manual_ack: true) do |*args|
         delivery_info, properties, payload = Hutch::Adapter.decode_message(*args)
@@ -108,8 +107,8 @@ module Hutch
         logger.info {
           spec   = serializer.binary? ? "#{payload.bytesize} bytes" : "#{payload}"
           "message(#{properties.message_id || '-'}): " +
-          "routing key: #{delivery_info.routing_key}, " +
-          "consumer: #{consumer}, " +
+                  "routing key: #{delivery_info.routing_key}, " +
+                  "consumer: #{consumer}, " +
           "payload: #{spec}"
         }
 
