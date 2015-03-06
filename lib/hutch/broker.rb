@@ -53,9 +53,10 @@ module Hutch
 
       exchange_name = @config[:mq_exchange]
       logger.info "using topic exchange '#{exchange_name}'"
-
-      with_bunny_precondition_handler('exchange') do
-        @exchange = @channel.topic(exchange_name, durable: true)
+      unless @config[:consume_only]
+        with_bunny_precondition_handler('exchange') do
+          @exchange = @channel.topic(exchange_name, durable: true)
+        end
       end
     end
 
@@ -128,7 +129,7 @@ module Hutch
       results = Hash.new { |hash, key| hash[key] = [] }
       @api_client.bindings.each do |binding|
         next if binding['destination'] == binding['routing_key']
-        next unless binding['source'] == @config[:mq_exchange] && !@config[:manual_bind]
+        next unless binding['source'] == @config[:mq_exchange] && !@config[:consume_only]
         next unless binding['vhost'] == @config[:mq_vhost]
         results[binding['destination']] << binding['routing_key']
       end
