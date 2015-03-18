@@ -206,11 +206,11 @@ module Hutch
       serializer = options[:serializer] || @config[:serializer]
 
       non_overridable_properties = {
-        routing_key:  routing_key,
+        routing_key: routing_key,
         timestamp:    @connection.current_timestamp,
         content_type: serializer.content_type,
       }
-      properties[:message_id]   ||= generate_id
+      properties[:message_id] ||= generate_id
 
       payload = serializer.encode(message)
       logger.info {

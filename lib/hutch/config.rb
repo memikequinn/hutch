@@ -24,6 +24,7 @@ module Hutch
         mq_api_host: 'localhost',
         mq_api_port: 15672,
         mq_api_ssl: false,
+        mq_verify_peer: false,
         heartbeat: 30,
         consume_only: false,
         # placeholder, allows specifying connection parameters
