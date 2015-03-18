@@ -78,6 +78,7 @@ module Hutch
       tls                = @config[:mq_tls]
       tls_key            = @config[:mq_tls_key]
       tls_cert           = @config[:mq_tls_cert]
+      verify_peer        = @config[:mq_verify_peer]
       heartbeat          = @config[:heartbeat]
       connection_timeout = @config[:connection_timeout]
       read_timeout       = @config[:read_timeout]
@@ -93,7 +94,7 @@ module Hutch
                               network_recovery_interval: 1,
                               connection_timeout: connection_timeout,
                               read_timeout: read_timeout,
-                              write_timeout: write_timeout)
+                              write_timeout: write_timeout, verify_peer: verify_peer)
 
       with_bunny_connection_handler(sanitized_uri) do
         @connection.start
