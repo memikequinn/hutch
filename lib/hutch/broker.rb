@@ -51,9 +51,9 @@ module Hutch
       open_connection!
       open_channel!
 
-      exchange_name = @config[:mq_exchange]
-      logger.info "using topic exchange '#{exchange_name}'"
       unless @config[:consume_only]
+        exchange_name = @config[:mq_exchange]
+        logger.info "using topic exchange '#{exchange_name}'"
         with_bunny_precondition_handler('exchange') do
           @exchange = @channel.topic(exchange_name, durable: true)
         end

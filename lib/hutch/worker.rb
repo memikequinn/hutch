@@ -31,9 +31,10 @@ module Hutch
 
         handle_signals until shutdown_not_called?(0.1)
       else
-      # Take a break from Thread#join every 0.1 seconds to check if we've
-      # been sent any signals
-      handle_signals until @broker.wait_on_threads(0.1)
+        # Take a break from Thread#join every 0.1 seconds to check if we've
+        # been sent any signals
+        handle_signals until @broker.wait_on_threads(0.1)
+      end
     end
 
     # Register handlers for SIG{QUIT,TERM,INT} to shut down the worker

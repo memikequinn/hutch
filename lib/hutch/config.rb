@@ -3,62 +3,63 @@ require 'erb'
 require 'logger'
 
 module Hutch
-  class UnknownAttributeError < StandardError; end
+  class UnknownAttributeError < StandardError;
+  end
 
   module Config
     require 'yaml'
 
     def self.initialize(params={})
       @config = {
-        mq_host: 'localhost',
-        mq_port: 5672,
-        mq_exchange: 'hutch',  # TODO: should this be required?
-        mq_vhost: '/',
-        mq_tls: false,
-        mq_tls_cert: nil,
-        mq_tls_key: nil,
-        mq_tls_ca_certificates: nil,
-        mq_verify_peer: true,
-        mq_username: 'guest',
-        mq_password: 'guest',
-        mq_api_host: 'localhost',
-        mq_api_port: 15672,
-        mq_api_ssl: false,
-        mq_verify_peer: false,
-        heartbeat: 30,
-        consume_only: false,
-        # placeholder, allows specifying connection parameters
-        # as a URI.
-        uri: nil,
-        log_level: Logger::INFO,
-        require_paths: [],
-        autoload_rails: true,
-        error_handlers: [Hutch::ErrorHandlers::Logger.new],
-        tracer: Hutch::Tracers::NullTracer,
-        namespace: nil,
-        daemonise: false,
-        pidfile: nil,
-        channel_prefetch: 0,
-        # enables publisher confirms, leaves it up to the app
-        # how they are tracked
-        publisher_confirms: false,
-        # like `publisher_confirms` above but also
-        # forces waiting for a confirm for every publish
-        force_publisher_confirms: false,
-        # Heroku needs > 10. MK.
-        connection_timeout: 11,
-        read_timeout: 11,
-        write_timeout: 11,
-        enable_http_api_use: true,
-        # Number of seconds that a running consumer is given
-        # to finish its job when gracefully exiting Hutch, before
-        # it's killed.
-        graceful_exit_timeout: 11,
-        client_logger: nil,
+          mq_host: 'localhost',
+          mq_port: 5672,
+          mq_exchange: 'hutch', # TODO: should this be required?
+          mq_vhost: '/',
+          mq_tls: false,
+          mq_tls_cert: nil,
+          mq_tls_key: nil,
+          mq_tls_ca_certificates: nil,
+          mq_verify_peer: true,
+          mq_username: 'guest',
+          mq_password: 'guest',
+          mq_api_host: 'localhost',
+          mq_api_port: 15672,
+          mq_api_ssl: false,
+          heartbeat: 30,
+          # are we only a consumer that does not publish?
+          consume_only: false,
+          # placeholder, allows specifying connection parameters
+          # as a URI.
+          uri: nil,
+          log_level: Logger::INFO,
+          require_paths: [],
+          autoload_rails: true,
+          error_handlers: [Hutch::ErrorHandlers::Logger.new],
+          tracer: Hutch::Tracers::NullTracer,
+          namespace: nil,
+          daemonise: false,
+          pidfile: nil,
+          channel_prefetch: 0,
+          # enables publisher confirms, leaves it up to the app
+          # how they are tracked
+          publisher_confirms: false,
+          # like `publisher_confirms` above but also
+          # forces waiting for a confirm for every publish
+          force_publisher_confirms: false,
+          # Heroku needs > 10. MK.
+          connection_timeout: 11,
+          read_timeout: 11,
+          write_timeout: 11,
+          enable_http_api_use: true,
+          # Number of seconds that a running consumer is given
+          # to finish its job when gracefully exiting Hutch, before
+          # it's killed.
+          graceful_exit_timeout: 11,
+          client_logger: nil,
 
-        consumer_pool_size: 1,
+          consumer_pool_size: 1,
 
-        serializer: Hutch::Serializers::JSON,
+          serializer: Hutch::Serializers::JSON,
       }.merge(params)
     end
 
@@ -73,7 +74,7 @@ module Hutch
     end
 
     class << self
-      alias_method :[],  :get
+      alias_method :[], :get
       alias_method :[]=, :set
     end
 
@@ -94,21 +95,29 @@ module Hutch
 
     def self.load_from_file(file, sub_config = nil)
       yaml = if sub_config
-        begin
-          Rails.root # do we have rails?
-          YAML.load_file(file)[Rails.env][sub_config.to_s]
-        rescue
-          YAML.load_file(file)
-        end
-      end
+               if defined?(Rails.root) # do we have rails?
+                 YAML.load(ERB.new(File.read(file)).result)[Rails.env].each do |attr, value|
+                   Hutch::Config.send("#{attr}=", convert_value(attr, value))
+                 end
+               else
+                 YAML.load_file(file)[Rails.env][sub_config.to_s]
+               end
+             else
+               YAML.load(ERB.new(File.read(file)).result).each do |attr, value|
+                 Hutch::Config.send("#{attr}=", convert_value(attr, value))
+               end
+               # rescue
+               #   YAML.load_file(file)
+             end
+      yaml
     end
 
     def self.convert_value(attr, value)
       case attr
-      when "tracer"
-        Kernel.const_get(value)
-      else
-        value
+        when "tracer"
+          Kernel.const_get(value)
+        else
+          value
       end
     end
 
